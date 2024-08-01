@@ -131,6 +131,10 @@ export class User extends BaseResource implements UserResource {
     return Passkey.registerPasskey();
   };
 
+  __experimentalCreatePassKey = (): Promise<PasskeyResource> => {
+    return Passkey.__experimental_fetchPasskey();
+  };
+
   createPhoneNumber = (params: CreatePhoneNumberParams): Promise<PhoneNumberResource> => {
     const { phoneNumber } = params || {};
     return new PhoneNumber(

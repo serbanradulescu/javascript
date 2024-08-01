@@ -35,6 +35,13 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
+  public static async __experimental_fetchPasskey() {
+    return BaseResource._fetch({
+      path: `/me/passkeys`,
+      method: 'POST',
+    }).then(res => new Passkey(res?.response as PasskeyJSON));
+  }
+
   private static async attemptVerification(
     passkeyId: string,
     credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,

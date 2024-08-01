@@ -14,6 +14,7 @@ import type {
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
@@ -321,6 +322,43 @@ export class SignIn extends BaseResource implements SignInResource {
       publicKeyCredential,
       strategy: 'passkey',
     });
+  };
+
+  public experimental_authenticateWithPasskey = async (
+    params?: AuthenticateWithPasskeyParams,
+  ): Promise<PublicKeyCredentialRequestOptionsWithoutExtensions> => {
+    const { flow } = params || {};
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+
+    if (flow === 'autofill' || flow === 'discoverable') {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.create({ strategy: 'passkey' });
+    } else {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      const passKeyFactor = this.supportedFirstFactors.find(
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+        f => f.strategy === 'passkey',
+      ) as PasskeyFactor;
+
+      if (!passKeyFactor) {
+        clerkVerifyPasskeyCalledBeforeCreate();
+      }
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.prepareFirstFactor(passKeyFactor);
+    }
+
+    const { nonce } = this.firstFactorVerification;
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyOptions('get');
+    }
+
+    return publicKeyOptions;
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
