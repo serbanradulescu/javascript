@@ -41,6 +41,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  WaitlistProps,
   Without,
 } from '@clerk/types';
 
@@ -109,6 +110,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignIn'
   | 'mountUserProfile'
   | '__experimental_mountUserVerification'
+  | 'mountWaitlist'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -155,6 +157,7 @@ type IsomorphicLoadedClerk = Without<
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   __experimental_mountUserVerification: (node: HTMLDivElement, props: __experimental_UserVerificationProps) => void;
+  mountWaitlist: (node: HTMLDivElement, props: WaitlistProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -170,6 +173,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
+  private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -180,6 +184,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountUserVerificationNodes = new Map<HTMLDivElement, __experimental_UserVerificationProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
+  private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -529,6 +534,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openCreateOrganization(this.preopenCreateOrganization);
     }
 
+    if (this.preOpenWaitlist !== null) {
+      clerkjs.openWaitlist(this.preOpenWaitlist);
+    }
+
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -551,6 +560,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountOrganizationListNodes.forEach((props: OrganizationListProps, node: HTMLDivElement) => {
       clerkjs.mountOrganizationList(node, props);
+    });
+
+    this.premountWaitlistNodes.forEach((props: WaitlistProps, node: HTMLDivElement) => {
+      clerkjs.mountWaitlist(node, props);
     });
 
     this.#loaded = true;
@@ -736,6 +749,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  openWaitlist = (props?: WaitlistProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openWaitlist(props);
+    } else {
+      this.preOpenWaitlist = props;
+    }
+  };
+
+  closeWaitlist = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeWaitlist();
+    } else {
+      this.preOpenWaitlist = null;
+    }
+  };
+
   openSignUp = (props?: SignUpProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignUp(props);
@@ -893,6 +922,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
+    }
+  };
+
+  mountWaitlist = (node: HTMLDivElement, props: WaitlistProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountWaitlist(node, props);
+    } else {
+      this.premountWaitlistNodes.set(node, props);
+    }
+  };
+
+  unmountWaitlist = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountWaitlist(node);
     }
   };
 
