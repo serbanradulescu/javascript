@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.9.2
+
+### Patch Changes
+
+- Improve JSDoc comments for some public API properties ([#4190](https://github.com/clerk/javascript/pull/4190)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7)]:
+  - @clerk/types@4.21.1
+  - @clerk/shared@2.8.2
+
 ## 5.9.1
 
 ### Patch Changes

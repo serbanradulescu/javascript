@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.22.4
+
+### Patch Changes
+
+- Fix UserProfile and OrganizationProfile wrong padding on footer for small screens when Development notice is enabled ([#4191](https://github.com/clerk/javascript/pull/4191)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7)]:
+  - @clerk/types@4.21.1
+  - @clerk/localizations@3.0.5
+  - @clerk/shared@2.8.2
+
 ## 5.22.3
 
 ### Patch Changes
